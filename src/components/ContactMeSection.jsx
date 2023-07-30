@@ -21,7 +21,6 @@ import {useAlertContext} from "../context/alertContext";
 const LandingSection = () => {
   const {isLoading, response, submit} = useSubmit();
   const { isOpen, type, message, onOpen, onClose} = useAlertContext();
-
   const {values, errors, touched, handleBlur, handleChange, handleSubmit} = useFormik({
      initialValues: { 
       firstName: '',
@@ -41,14 +40,7 @@ const LandingSection = () => {
         {response.type === 'error' && <p>{response.message}</p>}
         </div>
       )}
-       
-      
-     
-      
-       
-     
-     
-    },
+ },
     validationSchema:Yup.object({
       firstName: Yup.string().required('Required'),
       email: Yup.string().email('Invalid Email').required('Required'),
@@ -58,7 +50,38 @@ const LandingSection = () => {
       
     });
 
-        
+  const handleSubmitOfData = async(e) => {
+    e.preventDefault();
+    const {firstName, email, type, comment} = values;
+    const updatedValues = {
+      firstName: "",
+      email: "",
+      type: "",
+      comment: "",
+    };
+    
+    const res = await fetch("https://formvalidationstoredata-default-rtdb.firebaseio.com/formvalidationuserdata.json",
+    {
+        method: 'POST',
+        header:{
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName,
+          email, 
+          type, 
+          comment
+        })
+    }
+    ) 
+    if(res){
+     alert(`Successfully submitted Mrs. ${values.firstName}`)
+  }
+    else{
+      console.log("Failed")
+    }
+
+  }      
 
   return (
     
@@ -126,6 +149,7 @@ const LandingSection = () => {
               </FormControl>
                <Button
                type="submit"
+               onClick={handleSubmitOfData}
                isLoading={isLoading}
                colorScheme="purple"   width="full">
                 Submit
